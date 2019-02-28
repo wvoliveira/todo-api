@@ -1,0 +1,5 @@
+flask==1.0.2
+flask-restful==0.3.7
+redis==3.2.0
+json-logging==0.0.12
+prometheus-flask-exporter==0.5.1

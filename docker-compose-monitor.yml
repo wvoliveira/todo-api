@@ -1,0 +1,54 @@
+version: '3'
+
+services:
+  db:
+    image: redis:5.0.3
+
+  api:
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - "5000:5000"
+    environment:
+      - REDIS_HOST=db
+      - APP_DEBUG=True
+    depends_on:
+      - db
+
+  filebeat:
+    container_name: filebeat
+    build: monitor/filebeat
+    depends_on:
+      - logstash
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/containers:/var/lib/docker/containers
+    logging:
+      driver: none
+
+  logstash:
+    container_name: logstash
+    build: monitor/logstash
+    depends_on:
+      - elasticsearch
+    ports:
+      - "5044:5044"
+    logging:
+      driver: none
+
+  kibana:
+    container_name: kibana
+    build: monitor/kibana
+    depends_on:
+      - elasticsearch
+    ports:
+      - "5601:5601"
+    logging:
+      driver: none
+
+  elasticsearch:
+    container_name: elasticsearch
+    build: monitor/elasticsearch
+    logging:
+      driver: none
